@@ -34,8 +34,9 @@
 | 변수 | 기본값 | 쓰는 곳 |
 |---|---|---|
 | `ROLE_LESSONS_ROOT` | `~/.pi/agent/role-lessons` | `role_lessons.py` |
-| `REVIEW_GATE_PEER_RECORDS` | `~/.pi/agent/peer-records` | review-gate |
 | `XDG_STATE_HOME` | `~/.local/state` | worktree-guard |
+| `REVIEW_CANARY_LEDGER` | `~/.local/state/review-canary/ledger.jsonl` | review-gate canary |
+| `REVIEW_GATE_KEY` | 고정 공개 키와 맞는 `~/.config/review-gate/approver-<fp>.handle` | review-gate close |
 
 아래 변수는 테스트와 개발용입니다. 하나라도 설정하면 통과한 검사도 `pass-untrusted`(exit 4)로 보고합니다.
 
@@ -43,8 +44,18 @@
 |---|---|
 | `REVIEW_GATE_TRUST_DIR` | `/usr/local/etc/review-gate` |
 | `REVIEW_GATE_APPROVER` | `/usr/local/libexec/review-gate/approver` |
-| `REVIEW_GATE_KEY` | `~/.config/review-gate/approver-<fp>.handle` 중 고정 키와 맞는 파일 |
+| `REVIEW_GATE_PEER_RECORDS` | `~/.pi/agent/peer-records` |
 | `REVIEW_GATE_PATH` | 설치 때 고정한 PATH |
+
+`install-trusted.sh`의 `REVIEW_GATE_PREFIX`, `REVIEW_GATE_SUDO`, `REVIEW_GATE_INSTALL`, `REVIEW_GATE_APPROVER_BUILD`는 테스트용 임시 설치에서만 적용됩니다. 실제 설치 위치 `/usr/local`은 바꿀 수 없습니다.
+
+다음 값은 일부러 환경 변수로 열지 않았습니다. 에이전트가 값을 바꿔 검사를 끌 수 있기 때문입니다.
+
+- worktree-guard 예외 목록 경로와 git 시간 제한. 이 hook은 내부 오류가 나면 허용하므로, 시간 제한을 아주 짧게 하면 검사가 꺼집니다. 저장소 단위 해제는 `git config harness.worktreeGuard false`로만 합니다.
+- chatgpt-guard가 막는 도메인과 도구 목록.
+- review-gate의 시스템 계정 기준(uid 500)과 테스트 명령에 넘기는 환경 변수 목록.
+
+서명 키 폴더 `~/.config/review-gate`도 고정입니다. 키 파일은 고정 공개 키와 맞을 때만 쓰이므로 위치를 바꿀 이유가 없습니다.
 
 ## 테스트
 
