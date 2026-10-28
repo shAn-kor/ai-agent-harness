@@ -27,6 +27,25 @@
 | `tools/review-gate/`      | 에이전트 팀 리뷰 결과를 결정적으로 검사하는 도구(Python 표준 라이브러리만 사용)                       |
 | `docs/case-studies/`      | 실제 실패와 수정 기록                                                                                 |
 
+## 설정
+
+모든 설정은 선택 사항이고 환경 변수로 바꿉니다. 로컬 값을 파일로 둘 때는 저장소 루트의 `.env`에 쓰고 `set -a; . ./.env; set +a`로 불러옵니다. `.env`와 `.env.*`는 `.gitignore`에 있어 커밋되지 않습니다. 도구는 표준 라이브러리만 쓰므로 `.env`를 직접 읽지 않습니다.
+
+| 변수 | 기본값 | 쓰는 곳 |
+|---|---|---|
+| `ROLE_LESSONS_ROOT` | `~/.pi/agent/role-lessons` | `role_lessons.py` |
+| `REVIEW_GATE_PEER_RECORDS` | `~/.pi/agent/peer-records` | review-gate |
+| `XDG_STATE_HOME` | `~/.local/state` | worktree-guard |
+
+아래 변수는 테스트와 개발용입니다. 하나라도 설정하면 통과한 검사도 `pass-untrusted`(exit 4)로 보고합니다.
+
+| 변수 | 기본값 |
+|---|---|
+| `REVIEW_GATE_TRUST_DIR` | `/usr/local/etc/review-gate` |
+| `REVIEW_GATE_APPROVER` | `/usr/local/libexec/review-gate/approver` |
+| `REVIEW_GATE_KEY` | `~/.config/review-gate/approver-<fp>.handle` 중 고정 키와 맞는 파일 |
+| `REVIEW_GATE_PATH` | 설치 때 고정한 PATH |
+
 ## 테스트
 
 ```sh

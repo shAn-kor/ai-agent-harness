@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+
+# Local settings stay out of git. Variables are listed in README.md.
+.env
+.env.*
