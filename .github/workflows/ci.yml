@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: unittest (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # review-gate uses macOS sandbox-exec, so its suite runs on macOS only.
+        os: [macos-latest]
+        python: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Byte-compile all sources
+        run: python -m compileall -q hooks tools
+      - name: hooks
+        working-directory: hooks
+        run: python -B -m unittest -v test_worktree_guard test_chatgpt_guard
+      - name: review-gate
+        working-directory: tools/review-gate
+        run: python -B -m unittest -v test_review_gate test_role_lessons
+
+  hooks-linux:
+    name: hooks (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: hooks
+        working-directory: hooks
+        run: python -B -m unittest -v test_worktree_guard test_chatgpt_guard

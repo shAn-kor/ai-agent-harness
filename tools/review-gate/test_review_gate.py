@@ -828,7 +828,11 @@ class RevertCheckTest(RepoCase):
             start = time.monotonic()
             result = wt.run("/usr/bin/python3 -I -c " + shlex.quote(payload), 60)
             elapsed = time.monotonic() - start
-        pid = int(result["output"].split()[0])
+        # The runner's /usr/bin/python3 may log lines before the child's
+        # output, so take the line that is only the printed PID.
+        pids = [ln.strip() for ln in result["output"].splitlines() if ln.strip().isdigit()]
+        self.assertTrue(pids, result["output"])
+        pid = int(pids[-1])
         self.addCleanup(lambda: os.kill(pid, 9) if alive(pid) else None)
         self.assertLess(elapsed, 20, "a detached descendant stalled the run")
         self.assertFalse(alive(pid), f"detached pid {pid} survived")
